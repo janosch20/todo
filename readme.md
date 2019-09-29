@@ -1,4 +1,4 @@
-## Tested on
+## Tested
 * Chromium - Version 76.0.3809.100
 * PHP - 7.2.19
 * MariaDB - 10.1.41
@@ -9,7 +9,7 @@
 You will need a MariaDB/MySQL Server.
 Run the installation script 'sql/install.sql' to create the database 'todo'.
 
-A database user 'todo_user' with the password 'todo_user' will be created.
+A database user 'todo_user' with the password 'todo_password' will be created.
 Change the credentials in the following lines if you prefer. 
 ```mysql
 CREATE USER 'todo_user'@'%' IDENTIFIED BY 'todo_password';
