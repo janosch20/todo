@@ -6,13 +6,12 @@ ini_set('display_errors', true);
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../pimple.php';
 
-$session = new \Symfony\Component\HttpFoundation\Session\Session();
-$session->start();
-
 /** @var \Wolfi\Todo\Handler\UserHandler $userHandler */
 $userHandler = $pimple['userHandler'];
+/** @var \Symfony\Component\HttpFoundation\Session\Session $session */
+$session = $pimple['session'];
 
-if ($session->get('todo_userId') && $session->get('todo_userName')) {
+if ($userHandler->isLoggedIn($session)) {
     try {
         $user = $userHandler->getUser($session->get('todo_userId'));
     } catch (Exception $exception) {
@@ -28,10 +27,10 @@ if ($session->get('todo_userId') && $session->get('todo_userName')) {
 
 /** @var \Wolfi\Todo\Handler\TaskHandler $taskHandler */
 $taskHandler = $pimple['taskHandler'];
-$request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+$request = $pimple['request'];
 if (strlen($request->request->get('title'))) {
     $title = $request->request->get('title');
-    $description = strlen($request->request->get('description')) ? $request->request->get('description') : null;
+    $description = $request->request->get('description');
     $taskHandler->createTask($user->getUserId(), $title, $description);
 }
 
@@ -85,21 +84,39 @@ if (strlen($request->request->get('title'))) {
         </div>
     </div>
 
-    <div class="row margin-top-20">
+    <div class="row margin-top-50">
         <div class="col">
             <h2 class="text-primary">Your Tasks</h2>
-            <table class="table table-striped table-hover">
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="inputShowAll">
+                <label class="form-check-label" for="inputShowAll">Show all</label>
+            </div>
+            <table id="task-table" class="table table-striped table-hover">
+                <thead>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </thead>
                 <tbody>
                 <?php foreach ($taskHandler->getTasksByUserId($user->getUserId()) as $task): ?>
-                <tr>
-                    <td><?= $task->getTaskTitle() ?></td>
-                    <td><?= $task->getTaskDescription() ?></td>
-                    <td>
-                        <button class="btn btn-primary btnSetDone" data-task-id="<?= $task->getTaskId() ?>">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </td>
-                </tr>
+                    <tr style="<?= ($task->isTaskDone()) ? 'display: none;' : '' ?>" class="task-row" data-task-done="<?= ($task->isTaskDone()) ? 'true' : 'false' ?>" data-task-id="<?= $task->getTaskId() ?>">
+                        <td><?= $task->getTaskTitle() ?></td>
+                        <td><?= $task->getTaskDescription() ?></td>
+                        <td>
+                            <?php if ($task->isTaskDone()): ?>
+                                <span class="badge badge-success" data-badge-id="<?= $task->getTaskId() ?>">done</span>
+                            <?php else: ?>
+                                <span class="badge badge-warning" data-badge-id="<?= $task->getTaskId() ?>">open</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (!$task->isTaskDone()): ?>
+                                <button class="btn btn-primary btnSetDone" data-task-id="<?= $task->getTaskId() ?>">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
@@ -114,5 +131,7 @@ if (strlen($request->request->get('title'))) {
 <script src="resources/lib/jquery/jquery.min.js"></script>
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
 <script src="resources/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<script src="resources/js/index.js"></script>
 </body>
 </html>

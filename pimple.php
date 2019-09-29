@@ -1,11 +1,10 @@
 <?php
 
-
 $pimple = new \Pimple\Container();
 
 $pimple['dbHost'] = 'localhost';
 $pimple['dbUser'] = 'todo_user';
-$pimple['dbPassword'] = 'todo_user';
+$pimple['dbPassword'] = 'todo_password';
 
 /**
  * @param \Pimple\Container $pimple
@@ -15,6 +14,24 @@ $pimple['db'] = function ($pimple) {
     $dsn = "mysql:host={$pimple['dbHost']};dbname=todo;charset=utf8";
     $opt = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
     return new PDO($dsn, $pimple['dbUser'], $pimple['dbPassword'], $opt);
+};
+
+/**
+ * @param \Pimple\Container $pimple
+ * @return \Symfony\Component\HttpFoundation\Session\Session
+ */
+$pimple['session'] = function ($pimple) {
+    $session = new \Symfony\Component\HttpFoundation\Session\Session();
+    $session->start();
+    return $session;
+};
+
+/**
+ * @param \Pimple\Container $pimple
+ * @return \Symfony\Component\HttpFoundation\Request
+ */
+$pimple['request'] = function ($pimple) {
+    return \Symfony\Component\HttpFoundation\Request::createFromGlobals();
 };
 
 

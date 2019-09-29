@@ -1,5 +1,3 @@
-
-
 CREATE SCHEMA `todo` DEFAULT CHARACTER SET utf8 ;
 
 CREATE TABLE `todo`.`user` (
@@ -30,3 +28,8 @@ CREATE TABLE `todo`.`task` (
 
 ALTER TABLE `todo`.`task`
 ADD COLUMN `taskDone` TINYINT NOT NULL DEFAULT 0 AFTER `taskDescription`;
+
+INSERT INTO `todo`.`user` (`userName`, `userMail`, `userPasshash`) VALUES ('test', 'test@testmail.com', '$2y$10$0LtG0zCf8s2oGrVzppme6.vhPpBVULjDHIpQbSBur4n6HG7Dra7Bq');
+
+CREATE USER 'todo_user'@'%' IDENTIFIED BY 'todo_password';
+GRANT ALL PRIVILEGES ON todo.* TO 'todo_user'@'%';

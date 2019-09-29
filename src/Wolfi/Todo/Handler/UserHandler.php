@@ -2,6 +2,7 @@
 
 namespace Wolfi\Todo\Handler;
 
+use Symfony\Component\HttpFoundation\Session\Session;
 use Wolfi\Todo\Exception\UserExistsException;
 use Wolfi\Todo\Exception\UserNotFoundException;
 use Wolfi\Todo\User;
@@ -117,6 +118,18 @@ class UserHandler extends Handler
         }
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         if (password_verify($password, $row['userPasshash'])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param Session $session
+     * @return bool
+     */
+    public function isLoggedIn(Session $session)
+    {
+        if ($session->get('todo_userId') && $session->get('todo_userName')) {
             return true;
         }
         return false;

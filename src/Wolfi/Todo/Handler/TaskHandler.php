@@ -2,6 +2,7 @@
 
 namespace Wolfi\Todo\Handler;
 
+use Wolfi\Todo\Exception\TaskNotFoundException;
 use Wolfi\Todo\Task;
 
 class TaskHandler extends Handler
@@ -103,20 +104,24 @@ class TaskHandler extends Handler
      * @param int $taskId
      * @return Task
      */
-    public function setDone(int $taskId): Task
+    public function setDone(int $taskId, int $userId): Task
     {
         if (!isset($this->stmtCache['setDone'])) {
             $sql = "UPDATE task
                     SET taskDone = 1 
-                    WHERE taskId = :taskId
+                    WHERE taskId = :taskId AND userId = :userId
                     ";
             $this->stmtCache['setDone'] = $this->db->prepare($sql);
         }
         $stmt = $this->stmtCache['setDone'];
-        $stmt->execute(['taskId' => $taskId]);
+        $stmt->execute(['taskId' => $taskId, 'userId' => $userId]);
         return $this->getTask($taskId);
     }
 
+    /**
+     * @param Task $task
+     * @return Task
+     */
     public function updateTask(Task $task)
     {
         if (!isset($this->stmtCache['updateTask'])) {

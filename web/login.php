@@ -10,11 +10,14 @@ ini_set('display_errors', true);
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../pimple.php';
 
-$request = Request::createFromGlobals();
-$session = new Session();
-$session->start();
+/** @var Request $request */
+$request = $pimple['request'];
+/** @var Session $session */
+$session = $pimple['session'];
+/** @var \Wolfi\Todo\Handler\UserHandler $userHandler */
+$userHandler = $pimple['userHandler'];
 
-if ($session->get('todo_userId') && $session->get('todo_userName')) {
+if ($userHandler->isLoggedIn($session)) {
     $response = new RedirectResponse('index.php');
     $response->send();
 }
@@ -23,9 +26,6 @@ $invalidCredentials = false;
 if ($request->getMethod() == Request::METHOD_POST
     && strlen($request->request->get('username'))
     && strlen($request->request->get('password'))) {
-    /** @var \Wolfi\Todo\Handler\UserHandler $userHandler */
-    $userHandler = $pimple['userHandler'];
-
     try {
         if ($userHandler->authenticateUser($request->request->get('username'), $request->request->get('password'))) {
             $user = $userHandler->getUserByUserName($request->get('username'));
@@ -68,7 +68,8 @@ if ($request->getMethod() == Request::METHOD_POST
                 <div class="form-group">
                     <label for="inputUsername">Username</label>
                     <input type="text" class="form-control <?= ($invalidCredentials) ? 'is-invalid' : '' ?>"
-                           id="inputUsername" name="username" value="<?= ($request->request->get('username')) ? $request->request->get('username') : '' ?>"
+                           id="inputUsername" name="username"
+                           value="<?= ($request->request->get('username')) ? $request->request->get('username') : '' ?>"
                            placeholder="Enter Username" required>
                 </div>
                 <div class="form-group">
