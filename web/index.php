@@ -72,11 +72,11 @@ if (strlen($request->request->get('title'))) {
             <h2 class="text-primary">Add Task</h2>
             <form method="post" action="index.php">
                 <div class="form-group">
-                    <label for="inputTitle">Email address</label>
+                    <label for="inputTitle">Title</label>
                     <input type="text" class="form-control" name="title" id="inputTitle" placeholder="Enter title">
                 </div>
                 <div class="form-group">
-                    <label for="inputDescription">Example textarea</label>
+                    <label for="inputDescription">Description</label>
                     <textarea class="form-control" id="inputDescription" name="description" rows="3"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
